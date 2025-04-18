@@ -20,6 +20,8 @@ setup(
         "numpy>=1.20.0",
         "fire",
         "gdown",
+        "vllm",
+        "submitit",
     ],
     include_package_data=True,
     entry_points={
