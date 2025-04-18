@@ -48,3 +48,5 @@ src/virtualhome_eval/resources/behavior/pddl_files/
 logs/
 release_output/
 src/eai_eval/data
+!eval.ipynb
+slurm_servers/

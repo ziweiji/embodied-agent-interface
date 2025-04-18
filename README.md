@@ -146,50 +146,62 @@ Our benchmark provides a comprehensive assessment of LLM performance across diff
    eai-eval --help
    ```
 
-2. **Examples**:
-
--  ***Evaluate Results***
-   
-   
-   Make sure to download our results first if you don't want to specify <path_to_responses>
-   ```bash
-   python -m eai_eval.utils.download_utils
-   ```
-
-   Then, run the commands below:
-   ```bash
-   eai-eval --dataset virtualhome --eval-type action_sequencing --mode evaluate_results
-   eai-eval --dataset virtualhome --eval-type transition_modeling --mode evaluate_results
-   eai-eval --dataset virtualhome --eval-type goal_interpretation --mode evaluate_results
-   eai-eval --dataset virtualhome --eval-type subgoal_decomposition --mode evaluate_results
-   eai-eval --dataset behavior --eval-type action_sequencing --mode evaluate_results
-   eai-eval --dataset behavior --eval-type transition_modeling --mode evaluate_results
-   eai-eval --dataset behavior --eval-type goal_interpretation --mode evaluate_results
-   eai-eval --dataset behavior --eval-type subgoal_decomposition --mode evaluate_results
-   ```
+2. **Pipeline**:
 
 -  ***Generate Pormpts***
-   
-   
-   To generate prompts, you can run:
+
+    For behavior dataset, `subgoal_decomposition` and `action_sequencing` need local gpu!!! 
+    (Actually, class ActionSequenceEvaluator needs gpu but function for generate_prompts doesn't really use gpu. )
+
    ```bash
-   eai-eval --dataset virtualhome --eval-type action_sequencing --mode generate_prompts
-   eai-eval --dataset virtualhome --eval-type transition_modeling --mode generate_prompts
-   eai-eval --dataset virtualhome --eval-type goal_interpretation --mode generate_prompts
-   eai-eval --dataset virtualhome --eval-type subgoal_decomposition --mode generate_prompts
-   eai-eval --dataset behavior --eval-type action_sequencing --mode generate_prompts
-   eai-eval --dataset behavior --eval-type transition_modeling --mode generate_prompts
-   eai-eval --dataset behavior --eval-type goal_interpretation --mode generate_prompts
-   eai-eval --dataset behavior --eval-type subgoal_decomposition --mode generate_prompts
+   for dataset in virtualhome behavior; do
+   for type in action_sequencing transition_modeling goal_interpretation subgoal_decomposition; do
+   eai-eval --dataset $dataset --eval-type $type --mode generate_prompts &
+   done
+   done 
+   ```
+
+-  ***Generate Responses***
+
+    ```bash
+    python vllm-all.py -m {model_name}
+    
+    i=0 # you may change the idex of vllm server
+    for dataset in virtualhome behavior; do
+    for type in action_sequencing transition_modeling goal_interpretation subgoal_decomposition; do
+    python generate.py \
+    --model_name {model_name} \
+    --port $i \
+    --batch_size 40 \
+    --dataset $dataset \
+    --llm-response-path <path_to_responses> \
+    --eval_type $type &
+    done
+    done
+   ```
+
+-  ***Evaluate Results***
+
+   ```bash
+    for dataset in virtualhome behavior; do
+    for type in action_sequencing transition_modeling goal_interpretation subgoal_decomposition; do
+    eai-eval \
+    --dataset $dataset \
+    --mode evaluate_results \
+    --eval-type $type \
+    --output-dir output \
+    --num-workers 10 \
+    --llm-response-path <path_to_responses> &
+
+    done
+    done
    ```
 
 -  ***Simulation***
-
-
       To see the effect of our magic actions, refer to this [notebook](https://github.com/embodied-agent-interface/embodied-agent-interface/blob/main/examples/action_sequencing_simulation.ipynb).
   
 
-
+<!-- 
 3. **Evaluate All Modules in One Command**
 
 
@@ -203,9 +215,9 @@ Our benchmark provides a comprehensive assessment of LLM performance across diff
    ```bash
    eai-eval --all --dataset virtualhome
    ```
-   This will run both `generate_prompts` and `evaluate_results` for all modules in the `virtualhome` dataset. Make sure to download our results first if you don't want to specify <path_to_responses>
+   This will run both `generate_prompts` and `evaluate_results` for all modules in the `virtualhome` dataset. Make sure to download our results first if you don't want to specify <path_to_responses> -->
 
-# Docker
+<!-- # Docker
 We provide a ready-to-use Docker image for easy installation and usage.
 
 First, pull the Docker image from Docker Hub:
@@ -224,7 +236,7 @@ Test docker
 ```bash
 eai-eval
 ```
-By default, this will start generating prompts for goal interpretation in Behavior.
+By default, this will start generating prompts for goal interpretation in Behavior. -->
 
 
 
