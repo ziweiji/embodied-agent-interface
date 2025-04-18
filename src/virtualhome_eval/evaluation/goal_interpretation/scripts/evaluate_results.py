@@ -109,6 +109,7 @@ def evaluate_results(args):
             output = output.replace("'", '"')
             try:
                 output = json.loads(output)
+                assert type(output) == dict
             except Exception as e:
                 format_wrong_goals += 1
                 logger.info(f"format wrong num is {format_wrong_goals}")
