@@ -19,12 +19,13 @@ def get_llm_output(demo_name, result_list, lock, output_path):
                     return
     env = ActionSequenceEvaluator(demo_name=demo_name)
     try:
-        prompt = get_subgoal_prompt(env)
+        prompt, system_prompt = get_subgoal_prompt(env)
     except:
         raise Exception(f"Failed to generate prompt for {demo_name}")
     env.transition_model.env.close()
     rst = {
         "identifier": demo_name,
+        "system_prompt": system_prompt,
         "llm_prompt": prompt,
     }
     with lock:

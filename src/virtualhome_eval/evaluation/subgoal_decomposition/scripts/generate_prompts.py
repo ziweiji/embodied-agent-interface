@@ -86,6 +86,7 @@ def generate_prompts(args):
             helm_prompt_list.append(
                 {
                     'identifier': f'{scene_id}_{file_id}',
+                    "system_prompt": template_prompt["system_prompt"],
                     'llm_prompt': prompt
                 }
             )

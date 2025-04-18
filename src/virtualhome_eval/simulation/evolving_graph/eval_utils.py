@@ -1147,6 +1147,7 @@ def check_action_grammar(action_list):
             params.remove("") if "" in params else None
             # if len(params) != valid_actions[predicate_name][1]:
             # edit by shiwenxuan
+            predicate_name = predicate_name.upper()
             if len(params) // 2 != valid_actions[predicate_name][1]:
                 logger.info(
                     f"Action {predicate_name} has {params} arguments, but expected number is {valid_actions[predicate_name][1]}"
